@@ -1,5 +1,7 @@
 import json
 import time
+import os
+from pathlib import Path
 import streamlit as st
 from streamlit_chat import message
 from openai import OpenAI
@@ -11,9 +13,30 @@ if "generated" not in st.session_state:
 if "past" not in st.session_state:
     st.session_state["past"] = []
 
-# Initialize OpenAI client (ensure your API key is secure and not hardcoded)
+def load_env_file(env_path=".env"):
+    env_file = Path(__file__).with_name(env_path)
+    if not env_file.exists():
+        return
+
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        stripped_line = line.strip()
+        if not stripped_line or stripped_line.startswith("#") or "=" not in stripped_line:
+            continue
+
+        key, value = stripped_line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_env_file()
+
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    st.error("Missing GOOGLE_API_KEY. Add it to your .env file.")
+    st.stop()
+
+# Initialize OpenAI client using the environment secret
 client = OpenAI(
-    api_key="AIzaSyA2xsTRWr7APdETlxThhVfxJ6LQZQL774M",  # Replace with your actual API key
+    api_key=api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
