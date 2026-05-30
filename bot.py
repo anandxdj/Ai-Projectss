@@ -134,7 +134,7 @@ def get_response(user_query):
     """Generates a response from the OpenAI model based on the user query."""
     try:
         response = client.chat.completions.create(
-            model="gemini-2.0-flash",
+            model="gemini-flash-lite-latest",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_query},
